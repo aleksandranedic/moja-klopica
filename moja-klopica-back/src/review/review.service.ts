@@ -1,26 +1,55 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Client } from 'src/client/entities/client.entity';
+import { Restaurant } from 'src/restaurant/entities/restaurant.entity';
+import { Repository } from 'typeorm';
 import { CreateReviewDto } from './dto/create-review.dto';
-import { UpdateReviewDto } from './dto/update-review.dto';
+import { Review } from './entities/review.entity';
 
 @Injectable()
 export class ReviewService {
-  create(createReviewDto: CreateReviewDto) {
-    return 'This action adds a new review';
+  @InjectRepository(Review)
+  private readonly repository: Repository<Review>;
+  @InjectRepository(Restaurant)
+  private readonly restaurantRepo: Repository<Restaurant>;
+  @InjectRepository(Client)
+  private readonly clientRepo: Repository<Client>;
+
+  async create(createReviewDto: CreateReviewDto): Promise<boolean> {
+    const rest = await this.restaurantRepo.findOneBy({
+      Id: createReviewDto.restaurantId,
+    });
+    const client = await this.clientRepo.findOneBy({
+      Id: createReviewDto.clientId,
+    });
+    if (!rest || !client) return false;
+    const review: Review = new Review(
+      createReviewDto.comment,
+      createReviewDto.generalScore,
+      createReviewDto.atmosphereScore,
+    );
+    review.Restaurant = rest;
+    review.Client = client;
+    this.repository.save(review);
+    return true;
   }
 
-  findAll() {
-    return `This action returns all review`;
+  async findAll(): Promise<Review[]> {
+    return await this.repository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} review`;
+  async findOne(id: number): Promise<Review> {
+    return await this.repository.findOneBy({ Id: id });
   }
 
-  update(id: number, updateReviewDto: UpdateReviewDto) {
-    return `This action updates a #${id} review`;
-  }
+  /*async update(id: number, updateReviewDto: UpdateReviewDto) {
+    return `Review se ne update`;
+  }*/
 
-  remove(id: number) {
-    return `This action removes a #${id} review`;
+  async remove(id: number): Promise<boolean> {
+    const rew: Review = await this.findOne(id);
+    if (!rew) return false;
+    await this.repository.remove(rew);
+    return true;
   }
 }

@@ -1,13 +1,23 @@
+import { Column, PrimaryGeneratedColumn } from 'typeorm';
+
 export abstract class User {
-  private id: string;
+  @PrimaryGeneratedColumn()
+  private id: number;
+  @Column()
   private name: string;
+  @Column()
   private surname: string;
+  @Column()
   private phoneNumber: string;
+  @Column()
   private email: string;
+  @Column()
   private password: string;
+  @Column()
+  private deleted: boolean;
 
   constructor(
-    id: string,
+    id: number,
     name: string,
     surname: string,
     phoneNumber: string,
@@ -25,7 +35,7 @@ export abstract class User {
   get Id() {
     return this.id;
   }
-  set Id(value: string) {
+  set Id(value: number) {
     this.id = value;
   }
 
@@ -62,5 +72,11 @@ export abstract class User {
   }
   set PhoneNumber(value: string) {
     this.phoneNumber = value;
+  }
+  get Deleted() {
+    return this.deleted;
+  }
+  set Deleted(value: boolean) {
+    this.deleted = value;
   }
 }

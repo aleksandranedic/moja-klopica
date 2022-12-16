@@ -1,10 +1,20 @@
+import { Restaurant } from 'src/restaurant/entities/restaurant.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+
+@Entity()
 export class WorkHour {
-  private id: string;
+  @PrimaryGeneratedColumn()
+  private id: number;
+  @ManyToOne(() => Restaurant) //dodati cascade tako da kad se obrise restaurant sa tim id, da se obrise i ovaj review
+  private restaurant: Promise<Restaurant>; //oznaka da je lazy loading, nece da ucita restoran kad dobavljam Review iz baze
+  @Column()
   private dayOfWeek: number;
+  @Column('time')
   private openingTime: Date;
+  @Column('time')
   private closingTime: Date;
   constructor(
-    id: string,
+    id: number,
     dayOfWeek: number,
     openingTime: Date,
     closingTime: Date,
@@ -18,7 +28,7 @@ export class WorkHour {
   get Id() {
     return this.id;
   }
-  set Id(value: string) {
+  set Id(value: number) {
     this.id = value;
   }
   get DayOfWeek() {
@@ -38,5 +48,8 @@ export class WorkHour {
   }
   set ClosingTime(value: Date) {
     this.closingTime = value;
+  }
+  get Restaurant() {
+    return this.restaurant;
   }
 }

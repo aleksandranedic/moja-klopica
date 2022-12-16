@@ -1,13 +1,12 @@
 import { User } from 'src/entities/user.entity';
-import { Order } from 'src/order/entities/order.entity';
-import { Review } from 'src/review/entities/review.entity';
+import { Column, Entity } from 'typeorm';
 
+@Entity()
 export class Client extends User {
-  private reviews: Review[];
-  private orders: Order[];
-
+  @Column()
+  private verified: boolean; //Client cannot be logged after registration until he confirms his email
   constructor(
-    id: string,
+    id: number,
     name: string,
     surname: string,
     phoneNumber: string,
@@ -15,21 +14,5 @@ export class Client extends User {
     password: string,
   ) {
     super(id, name, surname, phoneNumber, email, password);
-    this.reviews = [];
-    this.orders = [];
-  }
-
-  get Reviews() {
-    return this.reviews;
-  }
-  set Reviews(reviews: Review[]) {
-    this.reviews = reviews;
-  }
-
-  get Orders() {
-    return this.orders;
-  }
-  set Orders(orders: Order[]) {
-    this.orders = orders;
   }
 }
