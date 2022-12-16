@@ -10,6 +10,8 @@ import { getEnvPath } from './common/helper/env.helper';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeOrmConfigService } from './shared/typeorm/typeorm.service';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 
 const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
 
@@ -22,6 +24,8 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
     OrderModule,
     OwnerModule,
     ClientModule,
+    AuthModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,7 +1,7 @@
-import { User } from 'src/entities/user.entity';
-import { Column, Entity } from 'typeorm';
+import { User } from 'src/users/entities/user.entity';
+import { ChildEntity, Column } from 'typeorm';
 
-@Entity()
+@ChildEntity()
 export class Client extends User {
   @Column()
   private verified: boolean; //Client cannot be logged after registration until he confirms his email

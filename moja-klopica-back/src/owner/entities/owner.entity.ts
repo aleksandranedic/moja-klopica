@@ -1,7 +1,7 @@
-import { User } from 'src/entities/user.entity';
-import { Entity } from 'typeorm';
+import { User } from 'src/users/entities/user.entity';
+import { ChildEntity } from 'typeorm';
 
-@Entity()
+@ChildEntity()
 export class Owner extends User {
   constructor(
     id: number,

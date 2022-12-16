@@ -1,5 +1,12 @@
-import { Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  TableInheritance,
+} from 'typeorm';
 
+@Entity()
+@TableInheritance({ column: { type: 'varchar', name: 'type' } })
 export abstract class User {
   @PrimaryGeneratedColumn()
   private id: number;
