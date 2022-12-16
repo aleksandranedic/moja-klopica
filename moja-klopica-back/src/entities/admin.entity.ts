@@ -2,7 +2,7 @@ import { User } from 'src/entities/user.entity';
 import { Entity } from 'typeorm';
 
 @Entity()
-export class Owner extends User {
+export class Admin extends User {
   constructor(
     id: number,
     name: string,

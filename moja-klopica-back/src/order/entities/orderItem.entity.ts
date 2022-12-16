@@ -1,11 +1,27 @@
 import { Meal } from 'src/restaurant/entities/meal.entity';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Order } from './order.entity';
 
+@Entity()
 export class OrderItem {
-  private id: string;
+  @PrimaryGeneratedColumn()
+  private id: number;
+  @OneToOne(() => Meal)
+  @JoinColumn()
   private meal: Meal;
+  @Column()
   private quantity: number;
+  @ManyToOne(() => Order)
+  order: Order;
 
-  constructor(id: string, meal: Meal, quantity: number) {
+  constructor(id: number, meal: Meal, quantity: number) {
     this.id = id;
     this.meal = meal;
     this.quantity = quantity;
@@ -13,7 +29,7 @@ export class OrderItem {
   get Id() {
     return this.id;
   }
-  set Id(value: string) {
+  set Id(value: number) {
     this.id = value;
   }
   get Meal() {

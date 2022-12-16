@@ -1,23 +1,26 @@
 import { CuisineCategory } from 'src/entities/category';
-import { WorkHour } from 'src/entities/workHour.entity';
-import { Order } from 'src/order/entities/order.entity';
-import { Review } from 'src/review/entities/review.entity';
-import { Meal } from './meal.entity';
-import { Menu } from './menu.entity';
+import { Owner } from 'src/owner/entities/owner.entity';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 
+@Entity()
 export class Restaurant {
-  private id: string;
+  @PrimaryGeneratedColumn()
+  private id: number;
+  @Column()
   private name: string;
+  @Column()
   private address: string;
+  @Column({
+    type: 'enum',
+    enum: CuisineCategory,
+  })
   private category: CuisineCategory;
+  @Column('simple-array')
   private images: string[];
-  private reviews: Review[];
-  private orders: Order[];
-  private menus: Menu[];
-  private workHours: WorkHour[];
-  private meals: Meal[];
+  @ManyToOne(() => Owner) //dodati cascade tako da kad se obrise restaurant sa tim id, da se obrise i ovaj review
+  private owner: Promise<Owner>; //oznaka da je lazy loading, nece da ucita restoran kad dobavljam Review iz baze
   constructor(
-    id: string,
+    id: number,
     name: string,
     address: string,
     category: CuisineCategory,
@@ -28,17 +31,12 @@ export class Restaurant {
     this.address = address;
     this.category = category;
     this.images = images;
-    this.reviews = [];
-    this.orders = [];
-    this.menus = [];
-    this.workHours = [];
-    this.meals = [];
   }
 
   get Id() {
     return this.id;
   }
-  set Id(value: string) {
+  set Id(value: number) {
     this.id = value;
   }
   get Name() {
@@ -67,37 +65,5 @@ export class Restaurant {
   }
   public addImage(imgPath: string) {
     this.images.push(imgPath);
-  }
-  get Reviews() {
-    return this.reviews;
-  }
-  set Reviews(value: Review[]) {
-    this.reviews = value;
-  }
-
-  get Orders() {
-    return this.orders;
-  }
-  set Orders(value: Order[]) {
-    this.orders = value;
-  }
-  get Menus() {
-    return this.menus;
-  }
-  set Menus(value: Menu[]) {
-    this.menus = value;
-  }
-
-  get WorkHours() {
-    return this.workHours;
-  }
-  set WorkHours(value: WorkHour[]) {
-    this.workHours = value;
-  }
-  get Meals() {
-    return this.meals;
-  }
-  set Meals(value: Meal[]) {
-    this.meals = value;
   }
 }

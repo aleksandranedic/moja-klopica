@@ -1,19 +1,23 @@
-import { Meal } from './meal.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Restaurant } from './restaurant.entity';
 
+@Entity()
 export class Menu {
-  private id: string;
+  @PrimaryGeneratedColumn()
+  private id: number;
+  @Column()
   private date: Date;
-  private meals: Meal[];
+  @ManyToOne(() => Restaurant) //dodati cascade tako da kad se obrise restaurant sa tim id, da se obrise i ovaj review
+  private restaurant: Promise<Restaurant>; //oznaka da je lazy loading, nece da ucita restoran kad dobavljam Review iz baze
 
-  constructor(id: string, date: Date) {
+  constructor(id: number, date: Date) {
     this.id = id;
     this.date = date;
-    this.meals = [];
   }
   get Id() {
     return this.id;
   }
-  set Id(value: string) {
+  set Id(value: number) {
     this.id = value;
   }
   get Date() {
@@ -21,11 +25,5 @@ export class Menu {
   }
   set Date(value: Date) {
     this.date = value;
-  }
-  get Meals() {
-    return this.meals;
-  }
-  set Meals(value: Meal[]) {
-    this.meals = value;
   }
 }

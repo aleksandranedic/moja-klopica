@@ -1,15 +1,32 @@
 import { MealType } from 'src/entities/mealType';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Menu } from './menu.entity';
+import { Restaurant } from './restaurant.entity';
 
+@Entity()
 export class Meal {
-  private id: string;
+  @PrimaryGeneratedColumn()
+  private id: number;
+  @Column()
   private title: string;
+  @Column({ length: 200 })
   private description: string;
+  @Column({
+    type: 'enum',
+    enum: MealType,
+  })
   private type: MealType;
+  @Column()
   private image: string;
+  @Column('float')
   private price: number;
+  @ManyToOne(() => Restaurant) //dodati cascade tako da kad se obrise restaurant sa tim id, da se obrise i ovaj review
+  private restaurant: Promise<Restaurant>; //oznaka da je lazy loading, nece da ucita restoran kad dobavljam Review iz baze
+  @ManyToOne(() => Menu)
+  private menu: Promise<Menu>; //oznaka da je lazy loading, nece da ucita restoran kad dobavljam Review iz baze
 
   constructor(
-    id: string,
+    id: number,
     title: string,
     description: string,
     type: MealType,
@@ -26,7 +43,7 @@ export class Meal {
   get Id() {
     return this.id;
   }
-  set Id(value: string) {
+  set Id(value: number) {
     this.id = value;
   }
   get Title() {
