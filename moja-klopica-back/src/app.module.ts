@@ -14,6 +14,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './shared/guards/role.guard';
 
 const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
 
@@ -35,6 +36,10 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
 })

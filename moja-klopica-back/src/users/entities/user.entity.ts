@@ -20,18 +20,16 @@ export abstract class User {
   private email: string;
   @Column()
   private password: string;
-  @Column()
+  @Column({ default: false })
   private deleted: boolean;
 
   constructor(
-    id: number,
     name: string,
     surname: string,
     phoneNumber: string,
     email: string,
     password: string,
   ) {
-    this.id = id;
     this.name = name;
     this.surname = surname;
     this.email = email;
@@ -53,7 +51,7 @@ export abstract class User {
     this.name = value;
   }
 
-  get Surame() {
+  get Surname() {
     return this.surname;
   }
   set Surname(value: string) {

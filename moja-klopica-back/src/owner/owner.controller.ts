@@ -1,15 +1,25 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { OwnerService } from './owner.service';
-import { CreateOwnerDto } from './dto/create-owner.dto';
+import { CreateOwner } from './dto/create-owner.dto';
 import { UpdateOwnerDto } from './dto/update-owner.dto';
+import { Role } from 'src/shared/decorators/role.decorator';
 
 @Controller('owner')
 export class OwnerController {
   constructor(private readonly ownerService: OwnerService) {}
 
+  @Role('Admin')
   @Post()
-  create(@Body() createOwnerDto: CreateOwnerDto) {
-    return this.ownerService.create(createOwnerDto);
+  async create(@Body() createOwner: CreateOwner) {
+    return await this.ownerService.create(createOwner);
   }
 
   @Get()

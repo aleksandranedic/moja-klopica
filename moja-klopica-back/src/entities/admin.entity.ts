@@ -4,13 +4,12 @@ import { ChildEntity } from 'typeorm';
 @ChildEntity()
 export class Admin extends User {
   constructor(
-    id: number,
     name: string,
     surname: string,
     phoneNumber: string,
     email: string,
     password: string,
   ) {
-    super(id, name, surname, phoneNumber, email, password);
+    super(name, surname, phoneNumber, email, password);
   }
 }
