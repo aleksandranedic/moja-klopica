@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { MailService } from 'src/mail/mail.service';
+import { DataSource } from 'typeorm';
 import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
-  @InjectRepository(User)
-  private readonly repository: Repository<User>;
-
   @InjectDataSource()
   private readonly dataSource: DataSource;
+
+  constructor(private mailService: MailService) {}
 
   async findOne(email: string): Promise<User> {
     const user = await this.dataSource
@@ -18,5 +18,9 @@ export class UsersService {
       .where('user.email = :email', { email: email })
       .getOne();
     return user;
+  }
+
+  async sendConfimarionMail(user: User, token: string) {
+    await this.mailService.sendUserConfirmation(user, token);
   }
 }

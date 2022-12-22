@@ -1,13 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { salt } from 'src/auth/secrets';
+import { hash } from 'src/auth/secrets';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { Client } from './entities/client.entity';
-import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class ClientService {
@@ -16,11 +15,8 @@ export class ClientService {
 
   constructor(private usersService: UsersService) {}
 
-  async create(createClientDto: CreateUserDto) {
-    const hashedPass: string = await bcrypt.hash(
-      createClientDto.password,
-      salt,
-    );
+  async create(createClientDto: CreateUserDto): Promise<boolean> {
+    const hashedPass: string = await hash(createClientDto.password);
     const user: User | null = await this.usersService.findOne(
       createClientDto.email,
     );
@@ -34,7 +30,10 @@ export class ClientService {
       createClientDto.email,
       hashedPass,
     );
-    return await this.repository.save(client);
+    await this.repository.save(client);
+    const hashedEmail: string = await hash(createClientDto.email);
+    await this.usersService.sendConfimarionMail(client, hashedEmail);
+    return true;
   }
 
   findAll() {
