@@ -7,17 +7,19 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
+import { SkipAuth } from 'src/shared/decorators/skip-auth.decorator';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { ClientService } from './client.service';
-import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 
 @Controller('client')
 export class ClientController {
   constructor(private readonly clientService: ClientService) {}
 
+  @SkipAuth()
   @Post()
-  create(@Body() createClientDto: CreateClientDto) {
-    return this.clientService.create(createClientDto);
+  async create(@Body() createClientDto: CreateUserDto) {
+    return await this.clientService.create(createClientDto);
   }
 
   @Get()

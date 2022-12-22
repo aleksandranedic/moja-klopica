@@ -1,5 +1,12 @@
-import { Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  TableInheritance,
+} from 'typeorm';
 
+@Entity()
+@TableInheritance({ column: { type: 'varchar', name: 'type' } })
 export abstract class User {
   @PrimaryGeneratedColumn()
   private id: number;
@@ -13,23 +20,25 @@ export abstract class User {
   private email: string;
   @Column()
   private password: string;
-  @Column()
+  @Column({ default: false })
   private deleted: boolean;
+  @Column({ default: false })
+  private verified: boolean; //Client and Owner cannot be logged after registration until he confirms his email
 
   constructor(
-    id: number,
     name: string,
     surname: string,
     phoneNumber: string,
     email: string,
     password: string,
+    verified = false,
   ) {
-    this.id = id;
     this.name = name;
     this.surname = surname;
     this.email = email;
     this.password = password;
     this.phoneNumber = phoneNumber;
+    this.verified = verified;
   }
 
   get Id() {
@@ -46,7 +55,7 @@ export abstract class User {
     this.name = value;
   }
 
-  get Surame() {
+  get Surname() {
     return this.surname;
   }
   set Surname(value: string) {
@@ -78,5 +87,11 @@ export abstract class User {
   }
   set Deleted(value: boolean) {
     this.deleted = value;
+  }
+  get Verified() {
+    return this.verified;
+  }
+  set Verified(value: boolean) {
+    this.verified = value;
   }
 }
