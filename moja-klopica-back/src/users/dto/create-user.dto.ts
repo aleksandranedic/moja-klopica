@@ -1,5 +1,4 @@
-export class CreateOwnerDto {}
-export interface CreateOwner {
+export interface CreateUserDto {
   email: string;
   password: string;
   name: string;

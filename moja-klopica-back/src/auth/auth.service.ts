@@ -4,6 +4,7 @@ import { LoggedUserInfo } from 'src/users/dto/logged-user.dto';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { localStrategyPayload } from './auth.types';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -17,7 +18,9 @@ export class AuthService {
     pass: string,
   ): Promise<localStrategyPayload | null> {
     const user: User = await this.usersService.findOne(email);
-    if (user && user.Password === pass) {
+    if (!user) return null;
+    const correctPass = await bcrypt.compare(pass, user.Password);
+    if (correctPass) {
       return { email: user.Email, id: user.Id };
     }
     return null;

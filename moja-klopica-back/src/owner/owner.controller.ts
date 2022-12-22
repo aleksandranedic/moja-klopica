@@ -8,9 +8,9 @@ import {
   Delete,
 } from '@nestjs/common';
 import { OwnerService } from './owner.service';
-import { CreateOwner } from './dto/create-owner.dto';
 import { UpdateOwnerDto } from './dto/update-owner.dto';
 import { Role } from 'src/shared/decorators/role.decorator';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
 
 @Controller('owner')
 export class OwnerController {
@@ -18,7 +18,7 @@ export class OwnerController {
 
   @Role('Admin')
   @Post()
-  async create(@Body() createOwner: CreateOwner) {
+  async create(@Body() createOwner: CreateUserDto) {
     return await this.ownerService.create(createOwner);
   }
 

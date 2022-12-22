@@ -22,6 +22,8 @@ export abstract class User {
   private password: string;
   @Column({ default: false })
   private deleted: boolean;
+  @Column({ default: false })
+  private verified: boolean; //Client and Owner cannot be logged after registration until he confirms his email
 
   constructor(
     name: string,
@@ -29,12 +31,14 @@ export abstract class User {
     phoneNumber: string,
     email: string,
     password: string,
+    verified = false,
   ) {
     this.name = name;
     this.surname = surname;
     this.email = email;
     this.password = password;
     this.phoneNumber = phoneNumber;
+    this.verified = verified;
   }
 
   get Id() {
@@ -83,5 +87,11 @@ export abstract class User {
   }
   set Deleted(value: boolean) {
     this.deleted = value;
+  }
+  get Verified() {
+    return this.verified;
+  }
+  set Verified(value: boolean) {
+    this.verified = value;
   }
 }
