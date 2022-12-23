@@ -15,14 +15,14 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './shared/guards/role.guard';
 import { MailModule } from './mail/mail.module';
-import { OptionsService } from './shared/factory/OptionsService';
+import { TypeOrmConfigService } from './shared/typeorm/typeorm.service';
 
 const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
 
 @Module({
   imports: [
     ConfigModule.forRoot({ envFilePath, isGlobal: true }),
-    TypeOrmModule.forRootAsync({ useClass: OptionsService }),
+    TypeOrmModule.forRootAsync({ useClass: TypeOrmConfigService }),
     RestaurantModule,
     ReviewModule,
     OrderModule,

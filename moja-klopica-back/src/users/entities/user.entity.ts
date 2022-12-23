@@ -23,7 +23,9 @@ export abstract class User {
   @Column({ default: false })
   private deleted: boolean;
   @Column({ default: false })
-  private verified: boolean; //Client and Owner cannot be logged after registration until he confirms his email
+  private verified: boolean;
+  @Column({ nullable: true })
+  private confimationToken: string;
 
   constructor(
     name: string,
@@ -93,5 +95,12 @@ export abstract class User {
   }
   set Verified(value: boolean) {
     this.verified = value;
+  }
+  get ConfirmationToken() {
+    return this.confimationToken;
+  }
+
+  set ConfirmationToken(value: string) {
+    this.confimationToken = value;
   }
 }

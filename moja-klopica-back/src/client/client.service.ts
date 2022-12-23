@@ -30,10 +30,15 @@ export class ClientService {
       createClientDto.email,
       hashedPass,
     );
-    await this.repository.save(client);
-    const hashedEmail: string = await hash(createClientDto.email);
-    await this.usersService.sendConfimarionMail(client, hashedEmail);
-    return true;
+    try {
+      const confirmationToken: string =
+        await this.usersService.sendConfimarionMail(client);
+      client.ConfirmationToken = confirmationToken;
+      await this.repository.save(client);
+      return true;
+    } catch (err) {
+      return false; //problem sa slanjem maila
+    }
   }
 
   findAll() {

@@ -30,10 +30,16 @@ export class OwnerService {
       createOwnerDto.email,
       hashedPass,
     );
-    await this.repository.save(owner);
-    const hashedEmail: string = await hash(createOwnerDto.email);
-    await this.usersService.sendConfimarionMail(owner, hashedEmail);
-    return true;
+    try {
+      const confirmationToken: string =
+        await this.usersService.sendConfimarionMail(owner);
+      owner.ConfirmationToken = confirmationToken;
+      await this.repository.save(owner);
+      return true;
+    } catch (err) {
+      console.log(err);
+      return false; //problem sa slanjem maila
+    }
   }
 
   findAll() {
