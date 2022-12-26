@@ -36,13 +36,13 @@ export class AuthService {
   async getUserInfo(email: string): Promise<LoggedUserInfo> {
     const user: User = await this.usersService.findOne(email);
     if (!user) return null;
-    return {
-      id: user.Id,
-      name: user.Name,
-      surname: user.Surname,
-      phoneNumber: user.PhoneNumber,
-      role: user.constructor.name,
-    };
+    return new LoggedUserInfo(
+      user.Id,
+      user.Name,
+      user.Surname,
+      user.PhoneNumber,
+      user.constructor.name,
+    );
   }
 
   async confirmMail(token: string) {

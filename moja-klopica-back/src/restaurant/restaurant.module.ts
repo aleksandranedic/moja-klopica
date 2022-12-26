@@ -6,9 +6,13 @@ import { Restaurant } from './entities/restaurant.entity';
 import { WorkHour } from 'src/restaurant/entities/workHour.entity';
 import { Menu } from './entities/menu.entity';
 import { Meal } from './entities/meal.entity';
+import { OwnerModule } from 'src/owner/owner.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Restaurant, WorkHour, Menu, Meal])],
+  imports: [
+    OwnerModule,
+    TypeOrmModule.forFeature([Restaurant, WorkHour, Menu, Meal]),
+  ],
   controllers: [RestaurantController],
   providers: [RestaurantService],
 })

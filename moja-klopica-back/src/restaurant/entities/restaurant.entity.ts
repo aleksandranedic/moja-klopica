@@ -20,13 +20,11 @@ export class Restaurant {
   @ManyToOne(() => Owner) //dodati cascade tako da kad se obrise restaurant sa tim id, da se obrise i ovaj review
   private owner: Promise<Owner>; //oznaka da je lazy loading, nece da ucita restoran kad dobavljam Review iz baze
   constructor(
-    id: number,
     name: string,
     address: string,
     category: CuisineCategory,
     images: string[],
   ) {
-    this.id = id;
     this.name = name;
     this.address = address;
     this.category = category;
@@ -65,5 +63,13 @@ export class Restaurant {
   }
   public addImage(imgPath: string) {
     this.images.push(imgPath);
+  }
+  get Owner() {
+    let ow: Owner;
+    (async () => (ow = await this.owner))();
+    return ow;
+  }
+  set Owner(value: Owner) {
+    this.owner = Promise.resolve(value);
   }
 }

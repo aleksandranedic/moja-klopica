@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UpdateOwnerDto } from './dto/update-owner.dto';
@@ -46,8 +50,15 @@ export class OwnerService {
     return `This action returns all owner`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} owner`;
+  async findOne(id: number): Promise<Owner> {
+    const user: Owner = await this.usersService.findOneById(id);
+    if (!user || !(user instanceof Owner)) {
+      throw new BadRequestException("Owner doesn't exist!");
+    }
+    if (!user.Verified) {
+      throw new UnauthorizedException('Owner is not verified!');
+    }
+    return user;
   }
 
   update(id: number, updateOwnerDto: UpdateOwnerDto) {

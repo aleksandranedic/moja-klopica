@@ -23,6 +23,15 @@ export class UsersService {
     return user;
   }
 
+  async findOneById(id: number): Promise<User> {
+    const user = await this.dataSource
+      .getRepository(User)
+      .createQueryBuilder('user')
+      .where('user.id = :id', { id: id })
+      .getOne();
+    return user;
+  }
+
   async findUserByConfimarionToken(token: string) {
     const user = await this.dataSource
       .getRepository(User)

@@ -9,5 +9,6 @@ import { UsersModule } from 'src/users/users.module';
   imports: [UsersModule, TypeOrmModule.forFeature([Owner])],
   controllers: [OwnerController],
   providers: [OwnerService],
+  exports: [OwnerService],
 })
 export class OwnerModule {}
