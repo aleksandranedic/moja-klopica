@@ -10,6 +10,6 @@ export class Admin extends User {
     email: string,
     password: string,
   ) {
-    super(name, surname, phoneNumber, email, password, true);
+    super(name, surname, phoneNumber, email, password);
   }
 }

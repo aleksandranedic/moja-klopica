@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoggedUserInfo } from 'src/users/dto/logged-user.dto';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { localStrategyPayload } from './auth.types';
-import * as bcrypt from 'bcrypt';
+import { isHashCorrect } from './secrets';
 
 @Injectable()
 export class AuthService {
@@ -19,8 +19,8 @@ export class AuthService {
   ): Promise<localStrategyPayload | null> {
     const user: User = await this.usersService.findOne(email);
     if (!user) return null;
-    const correctPass = await bcrypt.compare(pass, user.Password);
-    if (correctPass) {
+    const correctPass: boolean = await isHashCorrect(pass, user.Password);
+    if (correctPass && user.Verified) {
       return { email: user.Email, id: user.Id };
     }
     return null;
@@ -43,5 +43,13 @@ export class AuthService {
       phoneNumber: user.PhoneNumber,
       role: user.constructor.name,
     };
+  }
+
+  async confirmMail(token: string) {
+    const user: User | null =
+      await this.usersService.findUserByConfimarionToken(token);
+    if (!user)
+      throw new BadRequestException("User with confirmation key doesn't exist");
+    return await this.usersService.verifyAccount(user);
   }
 }

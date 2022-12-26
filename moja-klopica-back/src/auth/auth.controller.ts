@@ -1,4 +1,11 @@
-import { Controller, Request, Post, UseGuards, Get } from '@nestjs/common';
+import {
+  Controller,
+  Request,
+  Post,
+  UseGuards,
+  Get,
+  Query,
+} from '@nestjs/common';
 
 import { SkipAuth } from 'src/shared/decorators/skip-auth.decorator';
 import { AuthService } from './auth.service';
@@ -20,5 +27,11 @@ export class AuthController {
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;
+  }
+
+  @SkipAuth()
+  @Get('confirm')
+  confirmEmail(@Query() { token }) {
+    return this.authService.confirmMail(token);
   }
 }

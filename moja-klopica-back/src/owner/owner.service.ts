@@ -3,8 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UpdateOwnerDto } from './dto/update-owner.dto';
 import { Owner } from './entities/owner.entity';
-import * as bcrypt from 'bcrypt';
-import { salt } from 'src/auth/secrets';
+import { hash } from 'src/auth/secrets';
 import { UsersService } from 'src/users/users.service';
 import { User } from 'src/users/entities/user.entity';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
@@ -16,8 +15,8 @@ export class OwnerService {
 
   constructor(private usersService: UsersService) {}
 
-  async create(createOwnerDto: CreateUserDto) {
-    const hashedPass: string = await bcrypt.hash(createOwnerDto.password, salt);
+  async create(createOwnerDto: CreateUserDto): Promise<boolean> {
+    const hashedPass: string = await hash(createOwnerDto.password);
     const user: User | null = await this.usersService.findOne(
       createOwnerDto.email,
     );
@@ -31,7 +30,16 @@ export class OwnerService {
       createOwnerDto.email,
       hashedPass,
     );
-    return await this.repository.save(owner);
+    try {
+      const confirmationToken: string =
+        await this.usersService.sendConfimarionMail(owner);
+      owner.ConfirmationToken = confirmationToken;
+      await this.repository.save(owner);
+      return true;
+    } catch (err) {
+      console.log(err);
+      return false; //problem sa slanjem maila
+    }
   }
 
   findAll() {
