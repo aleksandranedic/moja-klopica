@@ -65,7 +65,15 @@ export class OwnerService {
     return `This action updates a #${id} owner`;
   }
 
-  remove(id: number) {
+  async remove(id: number) {
+    const owner = await this.findOne(id);
+    if (!owner) {
+      throw new BadRequestException("Owner doesn't exist!");
+    }
+    owner.Deleted = true;
+    //izbrisi sve njegove restorane
+    //sacuvaj izmenu
+    this.repository.save(owner);
     return `This action removes a #${id} owner`;
   }
 }

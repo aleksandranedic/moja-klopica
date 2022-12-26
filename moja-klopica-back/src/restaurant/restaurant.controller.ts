@@ -19,6 +19,7 @@ import { RestaurantTransform } from 'src/shared/pipes/tranformation/create-resta
 export class RestaurantController {
   constructor(private readonly restaurantService: RestaurantService) {}
 
+  //Da li admin dodaje restoran ili owner moze sam da dodaje? Ili moze owner dodaje, ali admin treba da potvrdi dodavanje
   @UsePipes(RestaurantTransform)
   @Role('Admin')
   @Post()

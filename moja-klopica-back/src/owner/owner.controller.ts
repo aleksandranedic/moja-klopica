@@ -38,8 +38,9 @@ export class OwnerController {
     return this.ownerService.update(+id, updateOwnerDto);
   }
 
+  @Role('Admin')
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ownerService.remove(+id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return await this.ownerService.remove(id);
   }
 }
