@@ -18,8 +18,7 @@ export class UsersService {
     const user = await this.dataSource
       .getRepository(User)
       .createQueryBuilder('user')
-      .where('user.email = :email', { email: email })
-      .andWhere('user.deleted = :deleted', { deleted: false })
+      .where('user.email = :email', { email })
       .getOne();
     return user;
   }
@@ -28,8 +27,7 @@ export class UsersService {
     const user = await this.dataSource
       .getRepository(User)
       .createQueryBuilder('user')
-      .where('user.id = :id', { id: id })
-      .andWhere('user.deleted = :deleted', { deleted: false })
+      .where('user.id = :id', { id })
       .getOne();
     return user;
   }
@@ -41,7 +39,6 @@ export class UsersService {
       .where('user.confimationToken = :confimationToken', {
         confimationToken: token,
       })
-      .andWhere('user.deleted = :deleted', { deleted: false })
       .getOne();
     return user;
   }

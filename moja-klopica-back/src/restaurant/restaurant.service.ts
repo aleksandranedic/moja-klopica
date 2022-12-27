@@ -43,12 +43,15 @@ export class RestaurantService {
     }
   }
 
-  findAll() {
-    return `This action returns all restaurant`;
+  async findAll(): Promise<Restaurant[]> {
+    return await this.restaurantRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} restaurant`;
+  async findOne(id: number) {
+    return await this.restaurantRepository
+      .createQueryBuilder('restaurant')
+      .where('restaurant.id = :id', { id })
+      .getOne();
   }
 
   update(id: number, updateRestaurantDto: UpdateRestaurantDto) {

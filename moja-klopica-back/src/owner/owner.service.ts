@@ -70,10 +70,7 @@ export class OwnerService {
     if (!owner) {
       throw new BadRequestException("Owner doesn't exist!");
     }
-    owner.Deleted = true;
-    //izbrisi sve njegove restorane
-    //sacuvaj izmenu
-    this.repository.save(owner);
+    await this.repository.softRemove(owner);
     return `This action removes a #${id} owner`;
   }
 }

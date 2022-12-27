@@ -1,5 +1,6 @@
 import {
   Column,
+  DeleteDateColumn,
   Entity,
   PrimaryGeneratedColumn,
   TableInheritance,
@@ -20,9 +21,9 @@ export abstract class User {
   private email: string;
   @Column()
   private password: string;
-  @Column({ default: false })
-  private deleted: boolean;
-  @Column({ default: false })
+  @DeleteDateColumn({ nullable: true })
+  private deletedDate: Date;
+  @Column({ type: 'boolean', default: false })
   private verified: boolean;
   @Column({ nullable: true })
   private confimationToken: string;
@@ -83,12 +84,6 @@ export abstract class User {
   }
   set PhoneNumber(value: string) {
     this.phoneNumber = value;
-  }
-  get Deleted() {
-    return this.deleted;
-  }
-  set Deleted(value: boolean) {
-    this.deleted = value;
   }
   get Verified() {
     return this.verified;

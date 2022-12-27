@@ -14,6 +14,7 @@ import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
 import { Role } from 'src/shared/decorators/role.decorator';
 import { RestaurantTransform } from 'src/shared/pipes/tranformation/create-restaurant.pipe';
+import { SkipAuth } from 'src/shared/decorators/skip-auth.decorator';
 
 @Controller('restaurant')
 export class RestaurantController {
@@ -32,9 +33,10 @@ export class RestaurantController {
     return this.restaurantService.findAll();
   }
 
+  @SkipAuth()
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.restaurantService.findOne(+id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return await this.restaurantService.findOne(id);
   }
 
   @Patch(':id')
