@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OwnerService } from 'src/owner/owner.service';
 import { Repository } from 'typeorm';
+import { createMealDto } from './dto/create-meal.dto';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
 import { WorkHourDto } from './dto/work-hour.dto';
+import { Meal } from './entities/meal.entity';
 import { Restaurant } from './entities/restaurant.entity';
 import { WorkHour } from './entities/workHour.entity';
 
@@ -14,6 +16,8 @@ export class RestaurantService {
   private readonly restaurantRepository: Repository<Restaurant>;
   @InjectRepository(WorkHour)
   private readonly workHourRepository: Repository<WorkHour>;
+  @InjectRepository(Meal)
+  private readonly mealRepository: Repository<Meal>;
 
   constructor(private ownerService: OwnerService) {}
 
@@ -47,7 +51,7 @@ export class RestaurantService {
     return await this.restaurantRepository.find();
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<Restaurant> {
     return await this.restaurantRepository
       .createQueryBuilder('restaurant')
       .where('restaurant.id = :id', { id })
@@ -60,5 +64,31 @@ export class RestaurantService {
 
   remove(id: number) {
     return `This action removes a #${id} restaurant`;
+  }
+
+  async findMeals(id: number) {
+    const res: Restaurant = await this.findOne(id);
+    if (!res) {
+      throw new BadRequestException("Restaurant doesn't exist!");
+    }
+    return await this.mealRepository
+      .createQueryBuilder('meal')
+      .where('meal.restaurantId = :id', { id })
+      .getMany();
+  }
+  async createMeal(id: number, createMealDto: createMealDto) {
+    const res: Restaurant = await this.findOne(id);
+    if (!res) {
+      throw new BadRequestException("Restaurant doesn't exist!");
+    }
+    const meal: Meal = new Meal(
+      createMealDto.title,
+      createMealDto.description,
+      createMealDto.type,
+      createMealDto.image,
+      createMealDto.price,
+    );
+    meal.Restaurant = res;
+    return await this.mealRepository.save(meal);
   }
 }
