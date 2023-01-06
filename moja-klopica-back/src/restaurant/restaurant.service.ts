@@ -67,7 +67,51 @@ export class RestaurantService {
     return res;
   }
 
-  update(id: number, updateRestaurantDto: UpdateRestaurantDto) {
+  async update(id: number, updateRestaurantDto: UpdateRestaurantDto) {
+    const restaurant: Restaurant = await this.findOne(id);
+    const keys = Object.keys(updateRestaurantDto);
+    for (const key of keys) {
+      if (key === 'ownerId')
+        throw new BadRequestException("You can't update restaurant's owner!");
+      if (key === 'workHours')
+        await this.updateWorkHours(id, updateRestaurantDto.workHours);
+      else {
+        restaurant[key] = updateRestaurantDto[key];
+      }
+    }
+    return await this.restaurantRepository.save(restaurant);
+  }
+
+  async updateWorkHours(restaurantId: number, workHourDto: WorkHourDto[]) {
+    const workHours = await this.findWorkHours(restaurantId);
+    for (const workHour of workHours) {
+      for (const newWorkHour of workHourDto) {
+        if (workHour.DayOfWeek === newWorkHour.dayOfWeek) {
+          workHour.OpeningTime = newWorkHour.openingTime;
+          workHour.ClosingTime = newWorkHour.closingTime;
+          await this.workHourRepository.save(workHour);
+          break;
+        }
+      }
+    }
+  }
+
+  async findWorkHours(restaurantId: number) {
+    const workHours: WorkHour[] = await this.workHourRepository
+      .createQueryBuilder('work_hour')
+      .where('work_hour.restaurantId = :id', { id: restaurantId })
+      .getMany();
+    if (!workHours || workHours.length === 0) {
+      throw new BadRequestException(
+        `There are no work hours for restaurant with id ${restaurantId} defined!`,
+      );
+    }
+    return workHours;
+  }
+  async addImages(id: number, images: string[]) {
+    //sacuvaj slike
+    const restaurant: Restaurant = await this.findOne(id);
+    for (const image of images) restaurant.addImage(image);
     return `This action updates a #${id} restaurant`;
   }
 

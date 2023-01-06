@@ -24,7 +24,9 @@ export class CreateRestaurantDto {
   category: CuisineCategory;
   @ArrayNotEmpty()
   workHours: WorkHourDto[];
-  @IsString()
+  @ArrayNotEmpty()
+  @IsNotEmpty({ each: true })
+  @IsString({ each: true })
   @IsOptional()
   images: string[];
 }

@@ -21,7 +21,7 @@ export class Restaurant {
     enum: CuisineCategory,
   })
   private category: CuisineCategory;
-  @Column('simple-array')
+  @Column('simple-array', { nullable: true })
   private images: string[];
   @DeleteDateColumn({ nullable: true })
   private deletedDate: Date;

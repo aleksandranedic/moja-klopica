@@ -43,12 +43,14 @@ export class RestaurantController {
     return await this.restaurantService.findOne(id);
   }
 
+  @UsePipes(RestaurantTransform)
+  @Role('Owner')
   @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateRestaurantDto: UpdateRestaurantDto,
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body(ExcludeNullPipe) updateRestaurantDto: UpdateRestaurantDto,
   ) {
-    return this.restaurantService.update(+id, updateRestaurantDto);
+    return await this.restaurantService.update(id, updateRestaurantDto);
   }
 
   @Delete(':id')
