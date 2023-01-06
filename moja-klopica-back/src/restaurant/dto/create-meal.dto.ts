@@ -9,7 +9,7 @@ import {
 
 import { MealType } from 'src/entities/mealType';
 
-export class createMealDto {
+export class CreateMealDto {
   @IsString()
   @IsOptional()
   image: string;

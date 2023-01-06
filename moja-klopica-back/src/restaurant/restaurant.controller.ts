@@ -15,8 +15,10 @@ import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
 import { Role } from 'src/shared/decorators/role.decorator';
 import { RestaurantTransform } from 'src/shared/pipes/tranformation/create-restaurant.pipe';
 import { SkipAuth } from 'src/shared/decorators/skip-auth.decorator';
-import { createMealDto } from './dto/create-meal.dto';
-import { createMenuDto } from './dto/create-menu.dto';
+import { CreateMealDto } from './dto/create-meal.dto';
+import { CreateMenuDto } from './dto/create-menu.dto';
+import { UpdateMealDto } from './dto/update-meal.dto';
+import { ExcludeNullPipe } from 'src/shared/pipes/tranformation/exclude-null.pipe';
 
 @Controller('restaurant')
 export class RestaurantController {
@@ -63,7 +65,7 @@ export class RestaurantController {
   @Post(':id/menu')
   async createMenu(
     @Param('id', ParseIntPipe) id: number,
-    @Body() createMenuDto: createMenuDto,
+    @Body() createMenuDto: CreateMenuDto,
   ) {
     return await this.restaurantService.createMenu(id, createMenuDto);
   }
@@ -78,8 +80,18 @@ export class RestaurantController {
   @Post(':id/meal')
   async createMeal(
     @Param('id', ParseIntPipe) id: number,
-    @Body() createMealDto: createMealDto,
+    @Body() createMealDto: CreateMealDto,
   ) {
     return await this.restaurantService.createMeal(id, createMealDto);
+  }
+
+  @Role('Owner')
+  @Patch(':id/meal/:mealId')
+  async updateMeal(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('mealId', ParseIntPipe) mealId: number,
+    @Body(ExcludeNullPipe) updateMealDto: UpdateMealDto,
+  ) {
+    return await this.restaurantService.updateMeal(id, mealId, updateMealDto);
   }
 }

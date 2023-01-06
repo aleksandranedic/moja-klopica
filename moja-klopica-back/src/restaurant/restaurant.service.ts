@@ -2,9 +2,10 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OwnerService } from 'src/owner/owner.service';
 import { Repository } from 'typeorm';
-import { createMealDto } from './dto/create-meal.dto';
-import { createMenuDto } from './dto/create-menu.dto';
+import { CreateMealDto } from './dto/create-meal.dto';
+import { CreateMenuDto } from './dto/create-menu.dto';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
+import { UpdateMealDto } from './dto/update-meal.dto';
 import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
 import { WorkHourDto } from './dto/work-hour.dto';
 import { Meal } from './entities/meal.entity';
@@ -82,7 +83,7 @@ export class RestaurantService {
       .getMany();
   }
 
-  async createMeal(id: number, createMealDto: createMealDto) {
+  async createMeal(id: number, createMealDto: CreateMealDto) {
     const res: Restaurant = await this.findOne(id);
     const meal: Meal = new Meal(
       createMealDto.title,
@@ -95,7 +96,7 @@ export class RestaurantService {
     return await this.mealRepository.save(meal);
   }
 
-  async createMenu(id: number, createMenuDto: createMenuDto) {
+  async createMenu(id: number, createMenuDto: CreateMenuDto) {
     const res: Restaurant = await this.findOne(id);
     const menu: Menu = new Menu(createMenuDto.date);
     menu.Restaurant = res;
@@ -123,5 +124,11 @@ export class RestaurantService {
       throw new BadRequestException('There is no defined meal!');
     }
     return meals;
+  }
+
+  async updateMeal(id: number, mealId: number, updateMealDto: UpdateMealDto) {
+    const meal: Meal = (await this.findMealsById(id, [mealId]))[0];
+    Object.assign(meal, updateMealDto);
+    return await this.mealRepository.save(meal);
   }
 }
