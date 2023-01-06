@@ -1,5 +1,12 @@
 import { MealType } from 'src/entities/mealType';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Menu } from './menu.entity';
 import { Restaurant } from './restaurant.entity';
 
@@ -22,8 +29,9 @@ export class Meal {
   private price: number;
   @ManyToOne(() => Restaurant, { lazy: true }) //dodati cascade tako da kad se obrise restaurant sa tim id, da se obrise i ovaj review
   private restaurant: Promise<Restaurant>; //oznaka da je lazy loading, nece da ucita restoran kad dobavljam Review iz baze
-  @ManyToOne(() => Menu)
-  private menu: Promise<Menu>; //oznaka da je lazy loading, nece da ucita restoran kad dobavljam Review iz baze
+  @ManyToMany(() => Menu, { lazy: true })
+  @JoinTable()
+  private menus: Menu[]; //oznaka da je lazy loading, nece da ucita restoran kad dobavljam Review iz baze
 
   constructor(
     title: string,
@@ -81,5 +89,14 @@ export class Meal {
   }
   set Restaurant(value: Restaurant) {
     this.restaurant = Promise.resolve(value);
+  }
+  get Menu() {
+    return this.menus;
+  }
+  set Menu(value: Menu[]) {
+    this.menus = value;
+  }
+  async addMenu(value: Menu) {
+    (await this.menus).push(value);
   }
 }

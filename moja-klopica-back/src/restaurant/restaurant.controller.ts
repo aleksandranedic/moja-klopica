@@ -16,6 +16,7 @@ import { Role } from 'src/shared/decorators/role.decorator';
 import { RestaurantTransform } from 'src/shared/pipes/tranformation/create-restaurant.pipe';
 import { SkipAuth } from 'src/shared/decorators/skip-auth.decorator';
 import { createMealDto } from './dto/create-meal.dto';
+import { createMenuDto } from './dto/create-menu.dto';
 
 @Controller('restaurant')
 export class RestaurantController {
@@ -53,24 +54,28 @@ export class RestaurantController {
     return this.restaurantService.remove(+id);
   }
 
-  @Get('menu/:id')
+  @Get(':id/menu')
   findMenuForTheDay(@Param('id') id: string) {
     return this.restaurantService.findOne(+id);
   }
 
-  @Post('menu/:id')
-  addMenu(@Param('id') id: string) {
-    return this.restaurantService.findOne(+id);
+  @Role('Owner')
+  @Post(':id/menu')
+  async createMenu(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() createMenuDto: createMenuDto,
+  ) {
+    return await this.restaurantService.createMenu(id, createMenuDto);
   }
 
   @Role('Owner')
-  @Get('meal/:id')
-  findMeals(@Param('id', ParseIntPipe) id: number) {
-    return this.restaurantService.findMeals(id);
+  @Get(':id/meal')
+  async findMeals(@Param('id', ParseIntPipe) id: number) {
+    return await this.restaurantService.findMeals(id);
   }
 
   @Role('Owner')
-  @Post('meal/:id')
+  @Post(':id/meal')
   async createMeal(
     @Param('id', ParseIntPipe) id: number,
     @Body() createMealDto: createMealDto,

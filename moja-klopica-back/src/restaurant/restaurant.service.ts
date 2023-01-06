@@ -3,10 +3,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { OwnerService } from 'src/owner/owner.service';
 import { Repository } from 'typeorm';
 import { createMealDto } from './dto/create-meal.dto';
+import { createMenuDto } from './dto/create-menu.dto';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
 import { WorkHourDto } from './dto/work-hour.dto';
 import { Meal } from './entities/meal.entity';
+import { Menu } from './entities/menu.entity';
 import { Restaurant } from './entities/restaurant.entity';
 import { WorkHour } from './entities/workHour.entity';
 
@@ -18,6 +20,8 @@ export class RestaurantService {
   private readonly workHourRepository: Repository<WorkHour>;
   @InjectRepository(Meal)
   private readonly mealRepository: Repository<Meal>;
+  @InjectRepository(Menu)
+  private readonly menuRepository: Repository<Menu>;
 
   constructor(private ownerService: OwnerService) {}
 
@@ -52,10 +56,14 @@ export class RestaurantService {
   }
 
   async findOne(id: number): Promise<Restaurant> {
-    return await this.restaurantRepository
+    const res: Restaurant = await this.restaurantRepository
       .createQueryBuilder('restaurant')
       .where('restaurant.id = :id', { id })
       .getOne();
+    if (!res) {
+      throw new BadRequestException("Restaurant doesn't exist!");
+    }
+    return res;
   }
 
   update(id: number, updateRestaurantDto: UpdateRestaurantDto) {
@@ -67,20 +75,15 @@ export class RestaurantService {
   }
 
   async findMeals(id: number) {
-    const res: Restaurant = await this.findOne(id);
-    if (!res) {
-      throw new BadRequestException("Restaurant doesn't exist!");
-    }
+    await this.findOne(id);
     return await this.mealRepository
       .createQueryBuilder('meal')
       .where('meal.restaurantId = :id', { id })
       .getMany();
   }
+
   async createMeal(id: number, createMealDto: createMealDto) {
     const res: Restaurant = await this.findOne(id);
-    if (!res) {
-      throw new BadRequestException("Restaurant doesn't exist!");
-    }
     const meal: Meal = new Meal(
       createMealDto.title,
       createMealDto.description,
@@ -90,5 +93,35 @@ export class RestaurantService {
     );
     meal.Restaurant = res;
     return await this.mealRepository.save(meal);
+  }
+
+  async createMenu(id: number, createMenuDto: createMenuDto) {
+    const res: Restaurant = await this.findOne(id);
+    const menu: Menu = new Menu(createMenuDto.date);
+    menu.Restaurant = res;
+    return await this.saveMealsMenu(id, menu, createMenuDto.mealId);
+  }
+
+  async saveMealsMenu(restaurantId: number, menu: Menu, mealIds: number[]) {
+    const meals = await this.findMealsById(restaurantId, mealIds);
+    //Ovo treba da bude jedna transakcija
+    menu = await this.menuRepository.save(menu);
+    for (const meal of meals) {
+      await meal.addMenu(menu);
+      await this.mealRepository.save(meal);
+    }
+    return meals;
+  }
+
+  async findMealsById(restaurantId: number, mealIds: number[]) {
+    const meals: Meal[] = await this.mealRepository
+      .createQueryBuilder('meal')
+      .where('meal.restaurantId = :id', { id: restaurantId })
+      .andWhere(`id IN (:...mealIds)`, { mealIds })
+      .getMany();
+    if (!meals || meals.length === 0) {
+      throw new BadRequestException('There is no defined meal!');
+    }
+    return meals;
   }
 }
