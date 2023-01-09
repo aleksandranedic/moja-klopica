@@ -15,5 +15,6 @@ import { OwnerModule } from 'src/owner/owner.module';
   ],
   controllers: [RestaurantController],
   providers: [RestaurantService],
+  exports: [RestaurantService],
 })
 export class RestaurantModule {}

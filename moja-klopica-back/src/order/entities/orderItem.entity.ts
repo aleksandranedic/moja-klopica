@@ -18,11 +18,10 @@ export class OrderItem {
   private meal: Meal;
   @Column()
   private quantity: number;
-  @ManyToOne(() => Order)
-  order: Order;
+  @ManyToOne(() => Order, { lazy: true })
+  private order: Order;
 
-  constructor(id: number, meal: Meal, quantity: number) {
-    this.id = id;
+  constructor(meal: Meal, quantity: number) {
     this.meal = meal;
     this.quantity = quantity;
   }
@@ -43,5 +42,11 @@ export class OrderItem {
   }
   set Quantity(value: number) {
     this.quantity = value;
+  }
+  get Order() {
+    return this.order;
+  }
+  set Order(value: Order) {
+    this.order = value;
   }
 }
