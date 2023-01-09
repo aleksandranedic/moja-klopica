@@ -1,6 +1,12 @@
 import { CuisineCategory } from 'src/entities/category';
 import { Owner } from 'src/owner/entities/owner.entity';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  DeleteDateColumn,
+} from 'typeorm';
 
 @Entity()
 export class Restaurant {
@@ -15,18 +21,22 @@ export class Restaurant {
     enum: CuisineCategory,
   })
   private category: CuisineCategory;
-  @Column('simple-array')
+  @Column('simple-array', { nullable: true })
   private images: string[];
-  @ManyToOne(() => Owner) //dodati cascade tako da kad se obrise restaurant sa tim id, da se obrise i ovaj review
-  private owner: Promise<Owner>; //oznaka da je lazy loading, nece da ucita restoran kad dobavljam Review iz baze
+  @DeleteDateColumn({ nullable: true })
+  private deletedDate: Date;
+  @ManyToOne(() => Owner, {
+    lazy: true,
+    onDelete: 'CASCADE',
+    orphanedRowAction: 'soft-delete',
+  })
+  private owner: Promise<Owner>;
   constructor(
-    id: number,
     name: string,
     address: string,
     category: CuisineCategory,
     images: string[],
   ) {
-    this.id = id;
     this.name = name;
     this.address = address;
     this.category = category;
@@ -65,5 +75,13 @@ export class Restaurant {
   }
   public addImage(imgPath: string) {
     this.images.push(imgPath);
+  }
+  get Owner() {
+    let ow: Owner;
+    (async () => (ow = await this.owner))();
+    return ow;
+  }
+  set Owner(value: Owner) {
+    this.owner = Promise.resolve(value);
   }
 }

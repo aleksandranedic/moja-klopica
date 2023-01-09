@@ -17,7 +17,7 @@ import { ConfigService } from '@nestjs/config';
             pass: config.get<string>('MAIL_PASSWORD'),
           },
         },
-        apiUrl: config.get<string>('MAIL_API_URL='),
+        apiUrl: config.get<string>('MAIL_API_URL'),
         defaults: {
           from: `"No Reply" <${config.get<string>('MAIL_FROM')}>`,
         },

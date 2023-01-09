@@ -18,7 +18,16 @@ export class UsersService {
     const user = await this.dataSource
       .getRepository(User)
       .createQueryBuilder('user')
-      .where('user.email = :email', { email: email })
+      .where('user.email = :email', { email })
+      .getOne();
+    return user;
+  }
+
+  async findOneById(id: number): Promise<User> {
+    const user = await this.dataSource
+      .getRepository(User)
+      .createQueryBuilder('user')
+      .where('user.id = :id', { id })
       .getOne();
     return user;
   }

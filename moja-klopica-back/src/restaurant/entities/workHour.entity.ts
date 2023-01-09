@@ -13,13 +13,7 @@ export class WorkHour {
   private openingTime: Date;
   @Column('time')
   private closingTime: Date;
-  constructor(
-    id: number,
-    dayOfWeek: number,
-    openingTime: Date,
-    closingTime: Date,
-  ) {
-    this.id = id;
+  constructor(dayOfWeek: number, openingTime: Date, closingTime: Date) {
     this.dayOfWeek = dayOfWeek;
     this.openingTime = openingTime;
     this.closingTime = closingTime;
@@ -50,6 +44,11 @@ export class WorkHour {
     this.closingTime = value;
   }
   get Restaurant() {
-    return this.restaurant;
+    let res: Restaurant;
+    (async () => (res = await this.restaurant))();
+    return res;
+  }
+  set Restaurant(value: Restaurant) {
+    this.restaurant = Promise.resolve(value);
   }
 }

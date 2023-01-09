@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { OwnerService } from './owner.service';
 import { UpdateOwnerDto } from './dto/update-owner.dto';
@@ -28,8 +29,8 @@ export class OwnerController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.ownerService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.ownerService.findOne(id);
   }
 
   @Patch(':id')
@@ -37,8 +38,9 @@ export class OwnerController {
     return this.ownerService.update(+id, updateOwnerDto);
   }
 
+  @Role('Admin')
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ownerService.remove(+id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return await this.ownerService.remove(id);
   }
 }

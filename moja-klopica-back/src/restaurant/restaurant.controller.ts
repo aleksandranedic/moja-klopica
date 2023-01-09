@@ -6,18 +6,31 @@ import {
   Patch,
   Param,
   Delete,
+  ParseIntPipe,
+  UsePipes,
 } from '@nestjs/common';
 import { RestaurantService } from './restaurant.service';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
+import { Role } from 'src/shared/decorators/role.decorator';
+import { RestaurantTransform } from 'src/shared/pipes/tranformation/create-restaurant.pipe';
+import { SkipAuth } from 'src/shared/decorators/skip-auth.decorator';
+import { CreateMealDto } from './dto/create-meal.dto';
+import { CreateMenuDto } from './dto/create-menu.dto';
+import { UpdateMealDto } from './dto/update-meal.dto';
+import { ExcludeNullPipe } from 'src/shared/pipes/tranformation/exclude-null.pipe';
+import { UpdateMenuDto } from './dto/update-menu.dto';
 
 @Controller('restaurant')
 export class RestaurantController {
   constructor(private readonly restaurantService: RestaurantService) {}
 
+  //Da li admin dodaje restoran ili owner moze sam da dodaje? Ili moze owner dodaje, ali admin treba da potvrdi dodavanje
+  @UsePipes(RestaurantTransform)
+  @Role('Admin')
   @Post()
-  create(@Body() createRestaurantDto: CreateRestaurantDto) {
-    return this.restaurantService.create(createRestaurantDto);
+  async create(@Body() createRestaurantDto: CreateRestaurantDto) {
+    return await this.restaurantService.create(createRestaurantDto);
   }
 
   @Get()
@@ -25,17 +38,20 @@ export class RestaurantController {
     return this.restaurantService.findAll();
   }
 
+  @SkipAuth()
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.restaurantService.findOne(+id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return await this.restaurantService.findOne(id);
   }
 
+  @UsePipes(RestaurantTransform)
+  @Role('Owner')
   @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateRestaurantDto: UpdateRestaurantDto,
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body(ExcludeNullPipe) updateRestaurantDto: UpdateRestaurantDto,
   ) {
-    return this.restaurantService.update(+id, updateRestaurantDto);
+    return await this.restaurantService.update(id, updateRestaurantDto);
   }
 
   @Delete(':id')
@@ -48,18 +64,47 @@ export class RestaurantController {
     return this.restaurantService.findOne(+id);
   }
 
+  @Role('Owner')
   @Post(':id/menu')
-  addMenu(@Param('id') id: string) {
-    return this.restaurantService.findOne(+id);
+  async createMenu(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() createMenuDto: CreateMenuDto,
+  ) {
+    return await this.restaurantService.createMenu(id, createMenuDto);
   }
 
+  @Role('Owner')
   @Get(':id/meal')
-  findMeals(@Param('id') id: string) {
-    return this.restaurantService.findOne(+id);
+  async findMeals(@Param('id', ParseIntPipe) id: number) {
+    return await this.restaurantService.findMeals(id);
   }
 
+  @Role('Owner')
   @Post(':id/meal')
-  addMeal(@Param('id') id: string) {
-    return this.restaurantService.findOne(+id);
+  async createMeal(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() createMealDto: CreateMealDto,
+  ) {
+    return await this.restaurantService.createMeal(id, createMealDto);
+  }
+
+  @Role('Owner')
+  @Patch(':id/meal/:mealId')
+  async updateMeal(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('mealId', ParseIntPipe) mealId: number,
+    @Body(ExcludeNullPipe) updateMealDto: UpdateMealDto,
+  ) {
+    return await this.restaurantService.updateMeal(id, mealId, updateMealDto);
+  }
+
+  @Role('Owner')
+  @Patch(':id/menu/:menuId')
+  async updateMenu(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('menuId', ParseIntPipe) menuId: number,
+    @Body(ExcludeNullPipe) updateMenuDto: UpdateMenuDto,
+  ) {
+    return await this.restaurantService.updateMenu(id, menuId, updateMenuDto);
   }
 }
