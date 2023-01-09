@@ -4,7 +4,6 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Order } from './order.entity';
@@ -13,12 +12,12 @@ import { Order } from './order.entity';
 export class OrderItem {
   @PrimaryGeneratedColumn()
   private id: number;
-  @OneToOne(() => Meal)
+  @ManyToOne(() => Meal, { eager: true })
   @JoinColumn()
   private meal: Meal;
   @Column()
   private quantity: number;
-  @ManyToOne(() => Order, { lazy: true })
+  @ManyToOne(() => Order, (order) => order.Id, { lazy: true })
   private order: Order;
 
   constructor(meal: Meal, quantity: number) {
