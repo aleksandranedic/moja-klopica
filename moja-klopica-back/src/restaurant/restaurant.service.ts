@@ -6,6 +6,7 @@ import { CreateMealDto } from './dto/create-meal.dto';
 import { CreateMenuDto } from './dto/create-menu.dto';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { UpdateMealDto } from './dto/update-meal.dto';
+import { UpdateMenuDto } from './dto/update-menu.dto';
 import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
 import { WorkHourDto } from './dto/work-hour.dto';
 import { Meal } from './entities/meal.entity';
@@ -174,5 +175,57 @@ export class RestaurantService {
     const meal: Meal = (await this.findMealsById(id, [mealId]))[0];
     Object.assign(meal, updateMealDto);
     return await this.mealRepository.save(meal);
+  }
+
+  async updateMenu(
+    restaurantId: number,
+    menuId: number,
+    updateMenuDto: UpdateMenuDto,
+  ) {
+    const menu: Menu = await this.findMenu(menuId);
+    if (updateMenuDto.date) {
+      menu.Date = updateMenuDto.date;
+      await this.menuRepository.save(menu);
+    }
+    if (updateMenuDto.mealId) {
+      return await this.updateMealsMenu(
+        restaurantId,
+        menu,
+        updateMenuDto.mealId,
+      );
+    }
+  }
+
+  async updateMealsMenu(restaurantId: number, menu: Menu, mealIds: number[]) {
+    const meals: Meal[] = await this.findMealsByMenuId(menu.Id);
+    for (const meal of meals) {
+      if (mealIds.includes(meal.Id)) {
+        mealIds = mealIds.filter((id) => id !== meal.Id);
+      } else {
+        await meal.removeMenu(menu);
+        await this.mealRepository.save(meal);
+      }
+    }
+    await this.saveMealsMenu(restaurantId, menu, mealIds);
+    return meals;
+  }
+
+  async findMealsByMenuId(menuId: number): Promise<Meal[]> {
+    const meals = await this.mealRepository
+      .createQueryBuilder('meal')
+      .innerJoinAndSelect('meal.menus', 'menu', 'menu.id = :menuId', { menuId })
+      .getMany();
+    return meals;
+  }
+
+  async findMenu(id: number) {
+    const menu: Menu = await this.menuRepository
+      .createQueryBuilder('menu')
+      .where('menu.id = :id', { id })
+      .getOne();
+    if (!menu) {
+      throw new BadRequestException("Menu doesn't exist!");
+    }
+    return menu;
   }
 }

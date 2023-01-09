@@ -19,6 +19,7 @@ import { CreateMealDto } from './dto/create-meal.dto';
 import { CreateMenuDto } from './dto/create-menu.dto';
 import { UpdateMealDto } from './dto/update-meal.dto';
 import { ExcludeNullPipe } from 'src/shared/pipes/tranformation/exclude-null.pipe';
+import { UpdateMenuDto } from './dto/update-menu.dto';
 
 @Controller('restaurant')
 export class RestaurantController {
@@ -95,5 +96,15 @@ export class RestaurantController {
     @Body(ExcludeNullPipe) updateMealDto: UpdateMealDto,
   ) {
     return await this.restaurantService.updateMeal(id, mealId, updateMealDto);
+  }
+
+  @Role('Owner')
+  @Patch(':id/menu/:menuId')
+  async updateMenu(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('menuId', ParseIntPipe) menuId: number,
+    @Body(ExcludeNullPipe) updateMenuDto: UpdateMenuDto,
+  ) {
+    return await this.restaurantService.updateMenu(id, menuId, updateMenuDto);
   }
 }

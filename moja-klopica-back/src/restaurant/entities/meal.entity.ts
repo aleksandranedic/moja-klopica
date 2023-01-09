@@ -99,4 +99,10 @@ export class Meal {
   async addMenu(value: Menu) {
     (await this.menus).push(value);
   }
+
+  async removeMenu(value: Menu) {
+    let menus = await this.menus;
+    menus = menus.filter((menu) => menu.Id != value.Id);
+    this.Menu = menus;
+  }
 }
