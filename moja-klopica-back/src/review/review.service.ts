@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ClientService } from 'src/client/client.service';
 import { Client } from 'src/client/entities/client.entity';
 import { Restaurant } from 'src/restaurant/entities/restaurant.entity';
+import { RestaurantService } from 'src/restaurant/restaurant.service';
 import { Repository } from 'typeorm';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { Review } from './entities/review.entity';
@@ -10,28 +12,27 @@ import { Review } from './entities/review.entity';
 export class ReviewService {
   @InjectRepository(Review)
   private readonly repository: Repository<Review>;
-  @InjectRepository(Restaurant)
-  private readonly restaurantRepo: Repository<Restaurant>;
-  @InjectRepository(Client)
-  private readonly clientRepo: Repository<Client>;
 
-  async create(createReviewDto: CreateReviewDto): Promise<boolean> {
-    const rest = await this.restaurantRepo.findOneBy({
-      Id: createReviewDto.restaurantId,
-    });
-    const client = await this.clientRepo.findOneBy({
-      Id: createReviewDto.clientId,
-    });
-    if (!rest || !client) return false;
+  constructor(
+    private clientService: ClientService,
+    private restaurantService: RestaurantService,
+  ) {}
+
+  async create(createReviewDto: CreateReviewDto): Promise<Review> {
+    const res: Restaurant = await this.restaurantService.findOne(
+      createReviewDto.restaurantId,
+    );
+    const client: Client = await this.clientService.findOne(
+      createReviewDto.clientId,
+    );
     const review: Review = new Review(
       createReviewDto.comment,
       createReviewDto.generalScore,
       createReviewDto.atmosphereScore,
     );
-    review.Restaurant = rest;
+    review.Restaurant = res;
     review.Client = client;
-    this.repository.save(review);
-    return true;
+    return await this.repository.save(review);
   }
 
   async findAll(): Promise<Review[]> {
@@ -39,12 +40,15 @@ export class ReviewService {
   }
 
   async findOne(id: number): Promise<Review> {
-    return await this.repository.findOneBy({ Id: id });
+    const review: Review = await this.repository
+      .createQueryBuilder('review')
+      .where('review.id = :id', { id })
+      .getOne();
+    if (!review) {
+      throw new BadRequestException(`Review with id ${id} doesn't exist.`);
+    }
+    return review;
   }
-
-  /*async update(id: number, updateReviewDto: UpdateReviewDto) {
-    return `Review se ne update`;
-  }*/
 
   async remove(id: number): Promise<boolean> {
     const rew: Review = await this.findOne(id);

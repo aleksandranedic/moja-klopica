@@ -8,10 +8,10 @@ export class Review {
   private id: number;
   @Column({ type: 'varchar', length: 200 })
   private comment: string;
-  @ManyToOne(() => Restaurant) //dodati cascade tako da kad se obrise restaurant sa tim id, da se obrise i ovaj review
-  private restaurant: Promise<Restaurant>; //oznaka da je lazy loading, nece da ucita restoran kad dobavljam Review iz baze
-  @ManyToOne(() => Client) //dodati cascade tako da kad se obrise restaurant sa tim id, da se obrise i ovaj review
-  private client: Promise<Client>; //oznaka da je lazy loading, nece da ucita restoran kad dobavljam Review iz baze
+  @ManyToOne(() => Restaurant, { lazy: true }) //dodati cascade tako da kad se obrise restaurant sa tim id, da se obrise i ovaj review
+  private restaurant: Restaurant; //oznaka da je lazy loading, nece da ucita restoran kad dobavljam Review iz baze
+  @ManyToOne(() => Client, { lazy: true }) //dodati cascade tako da kad se obrise restaurant sa tim id, da se obrise i ovaj review
+  private client: Client; //oznaka da je lazy loading, nece da ucita restoran kad dobavljam Review iz baze
   @Column()
   private generalScore: number;
   @Column()
@@ -47,19 +47,15 @@ export class Review {
     this.atmosphereScore = value;
   }
   get Restaurant() {
-    let res: Restaurant;
-    (async () => (res = await this.restaurant))();
-    return res;
+    return this.restaurant;
   }
   set Restaurant(value: Restaurant) {
-    this.restaurant = Promise.resolve(value);
+    this.restaurant = value;
   }
   get Client() {
-    let cl: Client;
-    (async () => (cl = await this.client))();
-    return cl;
+    return this.client;
   }
   set Client(value: Client) {
-    this.client = Promise.resolve(value);
+    this.client = value;
   }
 }
