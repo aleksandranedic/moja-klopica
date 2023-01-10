@@ -39,6 +39,20 @@ export class ReviewService {
     return await this.repository.find();
   }
 
+  async findReviewsByCriteria(idType: string, id: number) {
+    const reviews: Review[] = await this.repository
+      .createQueryBuilder('order')
+      .where(`order.${idType} = :id`, { id })
+      .getMany();
+    if (!reviews || reviews.length === 0) {
+      throw new BadRequestException(
+        `There are no reviews defined for ${
+          idType.split('Id')[0]
+        } with id ${id} !`,
+      );
+    }
+    return reviews;
+  }
   async findOne(id: number): Promise<Review> {
     const review: Review = await this.repository
       .createQueryBuilder('review')

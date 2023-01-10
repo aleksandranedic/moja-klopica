@@ -1,4 +1,11 @@
-import { IsNotEmpty, IsPositive, IsString, Length } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsPositive,
+  IsString,
+  Length,
+  Min,
+  Max,
+} from 'class-validator';
 
 export class CreateReviewDto {
   @IsNotEmpty()
@@ -13,8 +20,12 @@ export class CreateReviewDto {
   clientId: number;
   @IsNotEmpty()
   @IsPositive()
+  @Min(1)
+  @Max(5)
   generalScore: number;
   @IsNotEmpty()
   @IsPositive()
+  @Min(1)
+  @Max(5)
   atmosphereScore: number;
 }
