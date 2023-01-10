@@ -1,14 +1,24 @@
-import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { ReviewService } from './review.service';
 import { CreateReviewDto } from './dto/create-review.dto';
+import { Role } from 'src/shared/decorators/role.decorator';
 
 @Controller('review')
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 
+  @Role('Client')
   @Post()
-  create(@Body() createReviewDto: CreateReviewDto) {
-    return this.reviewService.create(createReviewDto);
+  async create(@Body() createReviewDto: CreateReviewDto) {
+    return await this.reviewService.create(createReviewDto);
   }
 
   @Get()
@@ -17,14 +27,9 @@ export class ReviewController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.reviewService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.reviewService.findOne(id);
   }
-
-  /*@Patch(':id')
-  update(@Param('id') id: string, @Body() updateReviewDto: UpdateReviewDto) {
-    return this.reviewService.update(+id, updateReviewDto);
-  }*/
 
   @Delete(':id')
   remove(@Param('id') id: string) {
