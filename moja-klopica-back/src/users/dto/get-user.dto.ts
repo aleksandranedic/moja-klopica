@@ -1,29 +1,22 @@
-import { ApiProperty } from '@nestjs/swagger';
-
-export class LoggedUserInfo {
-  @ApiProperty()
+export class GetUserDto {
   id: number;
-  @ApiProperty()
   name: string;
-  @ApiProperty()
   surname: string;
-  @ApiProperty()
   phoneNumber: string;
-  @ApiProperty()
-  role: string;
+  email: string;
 
   constructor(
     id: number,
     name: string,
     surname: string,
     phoneNumber: string,
-    role: string,
+    email: string,
   ) {
     this.id = id;
     this.name = name;
     this.surname = surname;
     this.phoneNumber = phoneNumber;
-    this.role = role;
+    this.email = email;
   }
 
   get Id(): number {
@@ -58,11 +51,11 @@ export class LoggedUserInfo {
     this.phoneNumber = phoneNumber;
   }
 
-  get Role(): string {
-    return this.role;
+  get Email(): string {
+    return this.email;
   }
 
-  set Role(role: string) {
-    this.role = role;
+  set Email(email: string) {
+    this.email = email;
   }
 }

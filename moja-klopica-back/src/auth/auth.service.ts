@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoggedUserInfo } from 'src/users/dto/logged-user.dto';
 import { User } from 'src/users/entities/user.entity';
@@ -46,10 +46,9 @@ export class AuthService {
   }
 
   async confirmMail(token: string) {
-    const user: User | null =
-      await this.usersService.findUserByConfimarionToken(token);
-    if (!user)
-      throw new BadRequestException("User with confirmation key doesn't exist");
+    const user: User = await this.usersService.findUserByConfimarionToken(
+      token,
+    );
     return await this.usersService.verifyAccount(user);
   }
 }

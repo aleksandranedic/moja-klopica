@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { MailService } from 'src/mail/mail.service';
 import { DataSource, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { generateToken } from 'src/auth/secrets';
+import { GetUserDto } from './dto/get-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -40,6 +41,10 @@ export class UsersService {
         confimationToken: token,
       })
       .getOne();
+    if (!user)
+      throw new NotFoundException(
+        `User with confirmation key ${token} doesn't exist`,
+      );
     return user;
   }
 
@@ -52,7 +57,21 @@ export class UsersService {
   async verifyAccount(user: User) {
     //ako je korisnik vec verifikovan, da li treba izbaciti gresku?
     user.Verified = true;
-    this.repository.save(user);
+    await this.repository.save(user);
     return true;
+  }
+
+  createGetUsersDto(users: User[]) {
+    return users.map((user) => this.createGetUserDto(user));
+  }
+
+  createGetUserDto(user: User): GetUserDto {
+    return new GetUserDto(
+      user.Id,
+      user.Name,
+      user.Surname,
+      user.PhoneNumber,
+      user.Email,
+    );
   }
 }

@@ -1,11 +1,13 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { hash } from 'src/auth/secrets';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { GetUserDto } from 'src/users/dto/get-user.dto';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
@@ -25,7 +27,7 @@ export class ClientService {
       createClientDto.email,
     );
     if (user) {
-      throw new BadRequestException('Email already registered');
+      throw new BadRequestException('Uneti email je već registrovan.');
     }
     const client: Client = new Client(
       createClientDto.name,
@@ -45,19 +47,29 @@ export class ClientService {
     }
   }
 
-  findAll() {
-    return `This action returns all client`;
+  async findAll() {
+    const clients = await this.findAllClients();
+    return this.usersService.createGetUsersDto(clients);
+  }
+
+  private async findAllClients(): Promise<Client[]> {
+    return await this.repository.find();
   }
 
   async findOne(id: number): Promise<Client> {
     const user: Client = await this.usersService.findOneById(id);
     if (!user || !(user instanceof Client)) {
-      throw new BadRequestException("Client doesn't exist!");
+      throw new NotFoundException(`Klijent koji ima id ${id} ne postoji.`);
     }
     if (!user.Verified) {
-      throw new UnauthorizedException('Client is not verified!');
+      throw new UnauthorizedException(`Klijent nije verifikovan.`);
     }
     return user;
+  }
+
+  async findOneDto(id: number): Promise<GetUserDto> {
+    const client: Client = await this.findOne(id);
+    return this.usersService.createGetUserDto(client);
   }
 
   update(id: number, updateClientDto: UpdateClientDto) {

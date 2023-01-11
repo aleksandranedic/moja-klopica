@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsEmail,
@@ -20,6 +21,9 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   surname: string;
+  @ApiProperty({
+    description: 'Phone number must start with +381',
+  })
   @IsPhoneNumber('SR')
   @IsNotEmpty()
   phoneNumber: string;
