@@ -1,13 +1,6 @@
 import { Client } from 'src/client/entities/client.entity';
 import { Restaurant } from 'src/restaurant/entities/restaurant.entity';
-import {
-  Column,
-  Entity,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { OrderItem } from './orderItem.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Order {
@@ -17,15 +10,12 @@ export class Order {
   private date: Date;
   @Column('float')
   private price: number;
-  @OneToMany(() => OrderItem, (item) => item.Id, { eager: true })
-  private items: OrderItem[];
-  @ManyToOne(() => Restaurant) //dodati cascade tako da kad se obrise restaurant sa tim id, da se obrise i ovaj review
-  private restaurant: Promise<Restaurant>; //oznaka da je lazy loading, nece da ucita restoran kad dobavljam Review iz baze
-  @ManyToOne(() => Client) //dodati cascade tako da kad se obrise restaurant sa tim id, da se obrise i ovaj review
-  private client: Promise<Client>; //oznaka da je lazy loading, nece da ucita restoran kad dobavljam Review iz baze
+  @ManyToOne(() => Restaurant, { lazy: true }) //dodati cascade tako da kad se obrise restaurant sa tim id, da se obrise i ovaj review
+  private restaurant: Restaurant; //oznaka da je lazy loading, nece da ucita restoran kad dobavljam Review iz baze
+  @ManyToOne(() => Client, { lazy: true }) //dodati cascade tako da kad se obrise restaurant sa tim id, da se obrise i ovaj review
+  private client: Client; //oznaka da je lazy loading, nece da ucita restoran kad dobavljam Review iz baze
 
-  constructor(id: number, date: Date, price: number) {
-    this.id = id;
+  constructor(date: Date, price: number) {
     this.date = date;
     this.price = price;
   }
@@ -47,10 +37,16 @@ export class Order {
   set Price(value: number) {
     this.price = value;
   }
-  get Items() {
-    return this.items;
+  get Restaurant() {
+    return this.restaurant;
   }
-  set Items(value: OrderItem[]) {
-    this.items = value;
+  set Restaurant(value: Restaurant) {
+    this.restaurant = value;
+  }
+  get Client() {
+    return this.client;
+  }
+  set Client(value: Client) {
+    this.client = value;
   }
 }

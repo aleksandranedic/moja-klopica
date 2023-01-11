@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { hash } from 'src/auth/secrets';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
@@ -45,8 +49,15 @@ export class ClientService {
     return `This action returns all client`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} client`;
+  async findOne(id: number): Promise<Client> {
+    const user: Client = await this.usersService.findOneById(id);
+    if (!user || !(user instanceof Client)) {
+      throw new BadRequestException("Client doesn't exist!");
+    }
+    if (!user.Verified) {
+      throw new UnauthorizedException('Client is not verified!');
+    }
+    return user;
   }
 
   update(id: number, updateClientDto: UpdateClientDto) {

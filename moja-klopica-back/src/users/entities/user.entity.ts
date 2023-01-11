@@ -98,4 +98,8 @@ export abstract class User {
   set ConfirmationToken(value: string) {
     this.confimationToken = value;
   }
+
+  get FullName() {
+    return `${this.name} ${this.surname}`;
+  }
 }
