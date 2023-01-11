@@ -100,6 +100,6 @@ export abstract class User {
   }
 
   get FullName() {
-    return this.name + ' ' + this.surname;
+    return `${this.name} ${this.surname}`;
   }
 }
